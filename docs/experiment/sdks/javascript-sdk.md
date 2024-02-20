@@ -32,11 +32,11 @@ Install the Experiment JavaScript Client SDK.
     ```html
     <script src="https://unpkg.com/@amplitude/experiment-js-client@1.9.0/dist/experiment.umd.js"></script>
     <script>
-        // TODO: Replace PROJECT_API_KEY with your own Amplitude project API key.
+        // TODO: Replace DEPLOYMENT_KEY with your own deployment key.
         // If you're using a 3rd party for analytics, configure an exposure
         // tracking provider.
         window.experiment = Experiment.Experiment.initializeWithAmplitudeAnalytics(
-            'PROJECT_API_KEY'
+            'DEPLOYMENT_KEY'
         );
     </script>
     ```
@@ -57,7 +57,7 @@ Install the Experiment JavaScript Client SDK.
 
         // (1) Initialize the experiment client with Amplitude Analytics.
         const experiment = Experiment.initializeWithAmplitudeAnalytics(
-            'PROJECT_API_KEY'
+            'DEPLOYMENT_KEY'
         );
 
         // (2) Start the SDK and await the promise result.
@@ -84,7 +84,7 @@ Install the Experiment JavaScript Client SDK.
         // (1) Initialize the experiment client and implement a
         //     custom exposure tracking provider.
         const experiment = Experiment.initialize(
-            'PROJECT_API_KEY',
+            'DEPLOYMENT_KEY',
             {
                 exposureTrackingProvider: {
                     track: (exposure) => {
@@ -124,7 +124,7 @@ The following functions make up the core of the Experiment client-side SDK.
 
 ### Initialize
 
-The SDK client should be initialized in your application on startup. The [Amplitude project API key](../general/data-model.md#projects]) argument passed into the `apiKey` parameter must live within the same project that you are sending analytics events to.
+The SDK client should be initialized in your application on startup. The [deployment key](../general/data-model.md#deployments) argument passed into the `apiKey` parameter must live within the same project that you are sending analytics events to.
 
 === "Amplitude Analytics"
 
@@ -140,7 +140,7 @@ The SDK client should be initialized in your application on startup. The [Amplit
 
 | Parameter | Requirement | Description |
 | --- | --- | --- |
-| `apiKey` | required | The [Amplitude project API key](../general/data-model.md#projects) which authorizes fetch requests and determines which flags should be evaluated for the user. |
+| `apiKey` | required | The [deployment key](../general/data-model.md#deployments) which authorizes fetch requests and determines which flags should be evaluated for the user. |
 | `config` | optional | The client [configuration](#configuration) used to customize SDK client behavior. |
 
 The initializer returns a singleton instance, so subsequent initializations for the same instance name will always return the initial instance. To create multiple instances, use the `instanceName` [configuration](#configuration).
@@ -150,7 +150,7 @@ The initializer returns a singleton instance, so subsequent initializations for 
     ```js
     import { Experiment } from '@amplitude/experiment-js-client';
 
-    const experiment = initializeWithAmplitudeAnalytics('PROJECT_API_KEY');
+    const experiment = initializeWithAmplitudeAnalytics('DEPLOYMENT_KEY');
     ```
 
     !!!note "Instance name"
@@ -162,7 +162,7 @@ The initializer returns a singleton instance, so subsequent initializations for 
     import { Experiment } from '@amplitude/experiment-js-client';
 
     const experiment = Experiment.initialize(
-        'PROJECT_API_KEY',
+        'DEPLOYMENT_KEY',
         {
             exposureTrackingProvider: {
                 track: (exposure) => {
@@ -181,7 +181,6 @@ The SDK client can be configured once on initialization.
 ???config "Configuration Options"
     | <div class="big-column">Name</div> | Description | Default Value |
     | --- | --- | --- |
-    | `deploymentKey` | The [Amplitude project API key](../general/data-model.md#deployments) which authorizes fetch requests and determines which flags should be evaluated for the user. | `undefined` |
     | `debug` | Enable additional debug logging within the SDK. Should be set to false in production builds. | `false` |
     | `fallbackVariant` | The default variant to fall back if a variant for the provided key doesn't exist. | `{}` |
     | `initialVariants` | An initial set of variants to access. This field is valuable for bootstrapping the client SDK with values rendered by the server using server-side rendering (SSR). | `{}` |
@@ -198,7 +197,6 @@ The SDK client can be configured once on initialization.
     | `userProvider` | An interface used to provide the user object to `fetch()` when called. See [Experiment User](https://developers.experiment.amplitude.com/docs/experiment-user#user-providers) for more information. | `null` |
     | `exposureTrackingProvider` | Implement and configure this interface to track exposure events through the experiment SDK, either automatically or explicitly. | `null` |
     | `instanceName` | Custom instance name for experiment SDK instance. **The value of this field is case-sensitive.** | `null` |
-    | `initialFlags` | A JSON string representing an initial set of flag configurations to use for local evaluation. | `undefined` |
 
 !!!info "EU Data Center"
     If you're using Amplitude's EU data center, configure the `serverZone` option on initialization to `eu`.
@@ -216,7 +214,7 @@ If you use either Amplitude or Segment Analytics SDKs to track events into Ampli
     import { Experiment } from '@amplitude/experiment-js-client';
 
     amplitude.init('API_KEY');
-    const experiment = Experiment.initializeWithAmplitudeAnalytics('PROJECT_API_KEY');
+    const experiment = Experiment.initializeWithAmplitudeAnalytics('DEPLOYMENT_KEY');
     ```
 
     Using the integration initializer will automatically configure implementations of the [user provider](#user-provider) and [exposure tracking provider](#exposure-tracking-provider) interfaces to pull user data from the Amplitude Analytics SDK and track exposure events.
@@ -235,7 +233,7 @@ If you use either Amplitude or Segment Analytics SDKs to track events into Ampli
 
     ```js
     analytics.ready(() => {
-        const experiment =  Experiment.initialize('PROJECT_API_KEY', {
+        const experiment =  Experiment.initialize('DEPLOYMENT_KEY', {
             exposureTrackingProvider: {
                 track: (exposure) => {
                     analytics.track('$exposure', exposure)
@@ -266,7 +264,7 @@ start(user?: ExperimentUser): Promise<void>
 
 | Parameter | Requirement | Description |
 | --- | --- | --- |
-| `user` | optional | Explicit [user](../general/data-model.md#users) information to pass with the request to fetch variants. This user information is merged with user information provided from [integrations](#integrations) via the [user provider](#user-provider), preferring properties passed explicitly to `fetch()` over provided properties. Also sets the user in the SDK for reuse. |
+| `user` | optional | Explicit [user](../general/data-model.md#users) information to pass with the request to fetch variants. This user information is merged with user information provided from [integrations](#integrations) via the [user provider](#user-provider), preferring properties passed explicitly to `fetch()` over provided properties. Also sets the user in the SDK for reuse. | `undefined` |
 
 Call `start()` when your application is initializing, after user information is available to use to evaluate or [fetch](#fetch) variants. The returned promise resolves after loading local evaluation flag configurations and fetching remote evaluation variants.
 
@@ -296,7 +294,7 @@ Configure the behavior of `start()` by setting `fetchOnStart` in the SDK configu
 
 ### Fetch
 
-Fetches variants for a [user](../general/data-model.md#users) and store the results in the client for fast access. This function [remote evaluates](../general/evaluation/remote-evaluation.md) the user for flags associated with the project API key or deployment key used to initialize the SDK client.
+Fetches variants for a [user](../general/data-model.md#users) and store the results in the client for fast access. This function [remote evaluates](../general/evaluation/remote-evaluation.md) the user for flags associated with the deployment used to initialize the SDK client.
 
 !!!tip "Fetch on user identity change"
     If you want the most up-to-date variants for the user, it's recommended that you call `fetch()` whenever the user state changes in a meaningful way. For example, if the user logs in and receives a user ID, or has a user property set which may effect flag or experiment targeting rules.
@@ -466,7 +464,7 @@ interface ExperimentUserProvider {
 To use your custom user provider, set the `userProvider` [configuration](#configuration) option with an instance of your custom implementation on SDK initialization.
 
 ```js
-const experiment = Experiment.initialize('PROJECT_API_KEY', {
+const experiment = Experiment.initialize('<DEPLOYMENT_KEY>', {
     userProvider: new CustomUserProvider(),
 });
 ```
@@ -486,7 +484,7 @@ The implementation of `track()` should track an event of type `$exposure` (a.k.a
 To use your custom user provider, set the `exposureTrackingProvider` [configuration](#configuration) option with an instance of your custom implementation on SDK initialization.
 
 ```js
-const experiment = Experiment.initialize('PROJECT_API_KEY', {
+const experiment = Experiment.initialize('<DEPLOYMENT_KEY>', {
     exposureTrackingProvider: new CustomExposureTrackingProvider(),
 });
 ```
@@ -498,7 +496,7 @@ You may want to bootstrap the experiment client with an initial set of flags and
 To bootstrap the client, set the flags and variants in the `initialVariants` [configuration](#configuration) object, then set the `source` to `Source.InitialVariants` so that the SDK client prefers the bootstrapped variants over any previously fetched & stored variants for the same flags.
 
 ```js
-const experiment = Experiment.initialize('PROJECT_API_KEY', {
+const experiment = Experiment.initialize('<DEPLOYMENT_KEY>', {
     initialVariants: { /* Flags and variants */ },
     source: Source.InitialVariants,
 });
