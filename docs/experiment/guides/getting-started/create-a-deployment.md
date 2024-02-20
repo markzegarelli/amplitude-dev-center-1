@@ -4,7 +4,7 @@ description: How to create a deployment for delivering your feature flags and ex
 template: guide.html
 ---
 
-Before creating a [feature-flag or experiment](../../general/data-model.md#flags-and-experiments), you'll need to first create a [deployment](../../general/data-model.md#deployments). In Amplitude Experiment, a deployment serves a group of flags or experiments for use in an application. Deployments have an associated key which is used to authorize requests to Amplitude Experiment's evaluation servers.
+In Amplitude Experiment, a [deployment](../../general/data-model.md#deployments) serves a group of [flags or experiments](../../general/data-model.md#flags-and-experiments) for use in an application. Deployments have an associated key which is used to authorize requests to Amplitude Experiment's evaluation servers.
 
 !!!info
     Deployments live within Amplitude Analytics [projects](../../general/data-model.md#projects). A project can have multiple deployments, but each deployment can only be attached to a single project.
